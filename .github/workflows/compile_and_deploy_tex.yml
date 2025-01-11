@@ -10,15 +10,28 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # キャッシュを有効化
+      - name: Cache TeX Live
+        uses: actions/cache@v3
+        with:
+          path: |
+            /usr/local/texlive
+            ~/.texlive*
+          key: ${{ runner.os }}-texlive
+          restore-keys: |
+            ${{ runner.os }}-texlive
+
       # リポジトリをチェックアウト
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # 必要なLaTeX環境をインストール
+      # TeX Live のインストール (キャッシュがヒットしない場合のみ)
       - name: Setup LaTeX environment
         run: |
-          sudo apt-get update
-          sudo apt-get install -y texlive-full latexmk biber
+          if [ ! -d "/usr/local/texlive" ]; then
+            sudo apt-get update
+            sudo apt-get install -y texlive-full latexmk biber
+          fi
 
       # latexmkでPDFをコンパイル
       - name: Compile LaTeX with latexmk
@@ -27,12 +40,14 @@ jobs:
 
       # コンパイル結果の確認
       - name: List generated files
-        run: ls -R
+        run: |
+          echo "Generated files in 'out' directory:"
+          ls -R out
 
       # PDFをGitHub Pagesにデプロイ
       - name: Deploy PDF to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: . # PDFが生成されたディレクトリ
-          destination_dir: pdf # デプロイ先のフォルダ名
+          publish_dir: out # 生成されたPDFが格納されたディレクトリ
+          destination_dir: pdf # デプロイ先フォルダ名
