@@ -17,7 +17,7 @@
         {
             "name": "latexmk",
             "command": "latexmk",
-            "args": ["-silent", "-outdir=TeXout", "%DOC%"]
+            "args": ["-silent", "%DOC%"]
         },
         {
             "name": "lualatex",
