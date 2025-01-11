@@ -1,9 +1,9 @@
 name: Build and Deploy PDF
 
 on:
-  push:
+  pull_request:
     branches:
-      - main  # mainブランチに変更があった場合にトリガー
+      - main
 
 jobs:
   build:
@@ -34,5 +34,5 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: .  # PDFが生成されたディレクトリ
+          publish_dir: . # PDFが生成されたディレクトリ
           destination_dir: pdf # デプロイ先のフォルダ名
