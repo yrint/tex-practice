@@ -1,9 +1,9 @@
 name: Build and Deploy PDF
 
 on:
-  push:
+  pull_request:
     branches:
-      - main # mainブランチに変更があった場合にトリガー
+      - main
 
 jobs:
   build:
