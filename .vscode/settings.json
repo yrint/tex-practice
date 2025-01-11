@@ -3,6 +3,14 @@
         {
             "name": "latexmk",
             "tools": ["latexmk"]
+        },
+        {
+            "name": "lualatex * 2",
+            "tools": ["lualatex", "lualatex"]
+        },
+        {
+            "name": "lualatex -> bibtex -> lualatex * 2",
+            "tools": ["lualatex", "bibtex", "lualatex", "lualatex"]
         }
     ],
     "latex-workshop.latex.tools": [
@@ -10,6 +18,16 @@
             "name": "latexmk",
             "command": "latexmk",
             "args": ["-silent", "-outdir=TeXout", "%DOC%"]
+        },
+        {
+            "name": "lualatex",
+            "command": "lualatex",
+            "args": ["--interaction=nonstopmode", "--synctex=0", "%DOC%"]
+        },
+        {
+            "name": "bibtex",
+            "command": "bibtex",
+            "args": ["%DOCFILE%"]
         }
     ]
 }
