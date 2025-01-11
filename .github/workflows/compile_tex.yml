@@ -1,0 +1,38 @@
+name: Build and Deploy PDF
+
+on:
+  push:
+    branches:
+      - main  # mainブランチに変更があった場合にトリガー
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # リポジトリをチェックアウト
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 必要なLaTeX環境をインストール
+      - name: Setup LaTeX environment
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y texlive-full latexmk biber
+
+      # latexmkでPDFをコンパイル
+      - name: Compile LaTeX with latexmk
+        run: |
+          latexmk -r .latexmkrc -pdf main.tex
+
+      # コンパイル結果の確認
+      - name: List generated files
+        run: ls -R
+
+      # PDFをGitHub Pagesにデプロイ
+      - name: Deploy PDF to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: .  # PDFが生成されたディレクトリ
+          destination_dir: pdf # デプロイ先のフォルダ名
