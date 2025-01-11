@@ -1,2 +1,2 @@
-*.log
-TeXout/
+out/
+.tex_intermediates/
