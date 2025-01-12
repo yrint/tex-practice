@@ -7,12 +7,12 @@ ENV DEBCONF_NOWARNINGS=yes
 ENV PATH="/usr/local/texlive/bin:$PATH"
 ENV LC_ALL=C
 
-# curl と Perl の依存関係をインストール
+# 必要な依存関係をインストール
 RUN apt-get update && \
-    apt-get install -y curl perl && \
+    apt-get install -y curl perl fontconfig && \
     rm -rf /var/lib/apt/lists/*
 
-# TeX Live frozen 版のインストール
+# TeX Live frozen 版のインストール（基本スキームでインストール）
 RUN mkdir /tmp/install-tl-unx && \
     curl -L https://ftp.jaist.ac.jp/pub/CTAN/systems/texlive/tlnet/install-tl-unx.tar.gz -o /tmp/install-tl-unx.tar.gz && \
     tar -xzvf /tmp/install-tl-unx.tar.gz -C /tmp/install-tl-unx --strip-components=1 && \
@@ -23,26 +23,24 @@ RUN mkdir /tmp/install-tl-unx && \
     rm -r /tmp/install-tl-unx && \
     ln -sf /usr/local/texlive/${TEXLIVE_VERSION}/bin/$(uname -m)-linux /usr/local/texlive/bin
 
+# 必要なパッケージをインストール
 RUN tlmgr update --self --all && \
     tlmgr install \
-    collection-bibtexextra \
-    collection-fontsrecommended \
+    collection-luatex \
     collection-langenglish \
     collection-langjapanese \
-    collection-latexextra \
     collection-latexrecommended \
-    collection-luatex \
-    collection-mathscience \
-    collection-plaingeneric \
+    collection-latexextra\
     latexmk \
-    latexdiff \
-    siunitx \
-    newtx \
-    svg \
-    latexindent && \
-    mktexlsr && \
-    useradd -m -u 1000 -s /bin/bash latex
+    latexindent
 
+# luatexフォーマットのみをインストール
+RUN fmtutil-sys --byfmt lualatex && \
+    mktexlsr
+
+# ユーザーの作成
+RUN useradd -m -u 1000 -s /bin/bash latex
+
+# 作業ディレクトリの設定
 USER latex
-
 WORKDIR /workdir
