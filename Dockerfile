@@ -1,59 +1,48 @@
-# ベースイメージとして軽量なTeX Liveを使用
-FROM debian:bullseye-slim
+FROM ubuntu:22.04
 
-# 必要な環境変数の設定
-ENV LANG=C.UTF-8 \
-    LC_ALL=C.UTF-8 \
-    PATH=/usr/local/texlive/2023/bin/x86_64-linux:$PATH
+ARG TEXLIVE_VERSION=2024
 
-# 必要なパッケージをインストール
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    wget \
-    perl \
-    xz-utils \
-    fontconfig \
-    fonts-noto-cjk \
-    fonts-noto-cjk-extra && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
+ENV DEBIAN_FRONTEND=noninteractive
+ENV DEBCONF_NOWARNINGS=yes
+ENV PATH="/usr/local/texlive/bin:$PATH"
+ENV LC_ALL=C
 
-# TeX Liveのインストール
-RUN wget http://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz && \
-    tar -xzf install-tl-unx.tar.gz && \
-    cd install-tl-* && \
-    echo "selected_scheme scheme-small" > texlive.profile && \
-    echo "tlpdbopt_install_docfiles 0" >> texlive.profile && \
-    echo "tlpdbopt_install_srcfiles 0" >> texlive.profile && \
-    ./install-tl --profile=texlive.profile && \
-    cd .. && rm -rf install-tl-* install-tl-unx.tar.gz
+# curl と Perl の依存関係をインストール
+RUN apt-get update && \
+    apt-get install -y curl perl && \
+    rm -rf /var/lib/apt/lists/*
 
-# 必要なパッケージをTeX Liveでインストール
-RUN tlmgr install \
-    collection-luatex \
-    collection-latexrecommended \
+# TeX Live frozen 版のインストール
+RUN mkdir /tmp/install-tl-unx && \
+    curl -L https://ftp.jaist.ac.jp/pub/CTAN/systems/texlive/tlnet/install-tl-unx.tar.gz -o /tmp/install-tl-unx.tar.gz && \
+    tar -xzvf /tmp/install-tl-unx.tar.gz -C /tmp/install-tl-unx --strip-components=1 && \
+    /bin/echo -e 'selected_scheme scheme-basic\ntlpdbopt_install_docfiles 0\ntlpdbopt_install_srcfiles 0' > /tmp/install-tl-unx/texlive.profile && \
+    /tmp/install-tl-unx/install-tl \
+    --repository http://mirror.ctan.org/systems/texlive/tlnet/ \
+    -profile /tmp/install-tl-unx/texlive.profile && \
+    rm -r /tmp/install-tl-unx && \
+    ln -sf /usr/local/texlive/${TEXLIVE_VERSION}/bin/$(uname -m)-linux /usr/local/texlive/bin
+
+RUN tlmgr update --self --all && \
+    tlmgr install \
+    collection-bibtexextra \
+    collection-fontsrecommended \
+    collection-langenglish \
+    collection-langjapanese \
     collection-latexextra \
-    luatexja \
-    biblatex \
+    collection-latexrecommended \
+    collection-luatex \
+    collection-mathscience \
+    collection-plaingeneric \
     latexmk \
-    l3build \
-    collection-fontsrecommended
+    latexdiff \
+    siunitx \
+    newtx \
+    svg \
+    latexindent && \
+    mktexlsr && \
+    useradd -m -u 1000 -s /bin/bash latex
 
-# フォントキャッシュの更新
-RUN fc-cache -fv
+USER latex
 
-# 非rootユーザーを作成
-ARG USERNAME=nonrootuser
-ARG USER_UID=1000
-ARG USER_GID=1000
-
-RUN groupadd --gid $USER_GID $USERNAME && \
-    useradd --uid $USER_UID --gid $USER_GID --shell /bin/bash --create-home $USERNAME && \
-    mkdir -p /workdir && chown $USERNAME:$USERNAME /workdir
-
-# 非rootユーザーに切り替え
-USER $USERNAME
-
-# 作業ディレクトリ
 WORKDIR /workdir
-
-# コンテナ起動時にデフォルトのシェルを使用
-CMD ["bash"]
