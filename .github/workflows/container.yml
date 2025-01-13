@@ -33,6 +33,18 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      # Docker イメージがビルドされたか確認
+      - name: Verify Docker image
+        run: |
+          echo "Listing Docker images to verify the build:"
+          docker images
+          if ! docker images | grep -q "texlive-container"; then
+            echo "Docker image 'texlive-container:latest' was not built successfully."
+            exit 1
+          else
+            echo "Docker image 'texlive-container:latest' was built successfully."
+          fi
+
       # コンテナを使ってLaTeXファイルをコンパイル
       - name: Compile LaTeX with Docker container
         run: |
