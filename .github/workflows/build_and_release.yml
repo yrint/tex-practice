@@ -78,12 +78,6 @@ jobs:
         with:
           name: pdf
 
-      # ダウンロードしたPDFの一覧
-      - name: List downloaded PDF files
-        run: |
-          echo "Downloaded PDF files in the 'pdf' directory:"
-          ls -R pdf
-
       # PDFをGitHub Pagesにデプロイ
       - name: Deploy PDF to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
