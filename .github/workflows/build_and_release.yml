@@ -81,8 +81,8 @@ jobs:
       # ダウンロードしたPDFファイルをリストする
       - name: List downloaded PDF files
         run: |
-          echo "Listing downloaded PDF files:"
-          ls -R pdf
+          echo "Listing downloaded files in the working directory:"
+          ls -R $GITHUB_WORKSPACE/pdf
 
       # PDFをGitHub Pagesにデプロイ
       - name: Deploy PDF to GitHub Pages
