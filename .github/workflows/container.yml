@@ -50,7 +50,7 @@ jobs:
       - name: Compile LaTeX with Docker container
         run: |
           docker run --rm -v ${{ github.workspace }}:/workdir texlive-container:latest \
-          sh -c "mkdir -p /workdir/out/pdf /workdir/out/.tex_intermediates && chmod -R 777 /workdir/out && cd tex && latexmk -r .latexmkrc -pdf main.tex"
+          sh -c "cd tex && latexmk -r .latexmkrc -pdf main.tex"
 
       # コンパイルされたPDFを確認
       - name: List generated files

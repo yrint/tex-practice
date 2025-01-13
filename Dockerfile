@@ -52,6 +52,9 @@ RUN fmtutil-sys --byfmt lualatex && \
 # ユーザーの作成
 RUN useradd -m -u 1000 -s /bin/bash latex
 
-# 作業ディレクトリの設定
-USER latex
+# 作業ディレクトリの設定と権限の変更
 WORKDIR /workdir
+RUN chown -R latex:latex /workdir
+
+# 作業ディレクトリに移動
+USER latex
