@@ -1,5 +1,5 @@
 # PDFのビルドとリリースを行うワークフロー
-name: Build and Release PDF
+name: Build and Deploy PDF
 
 # masterブランチへのpush、またはvから始まるタグに対して実行
 on:
@@ -51,10 +51,8 @@ jobs:
           name: pdf
           path: out/pdf/${{ env.ARTIFACT_NAME }}
 
-  # GitHubのRelease作成ジョブ
-  release:
-    # タグがpushされた場合のみ実行
-    if: startsWith(github.ref, 'refs/tags/')
+  # PDFのDeploy
+  Deploy-PDF:
     needs: build
     runs-on: ubuntu-22.04
 
@@ -69,12 +67,10 @@ jobs:
         with:
           name: pdf
 
-      # GitHub Releaseを作成
-      - name: Create GitHub Release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          # タグ名からバージョンを抽出
-          VERSION=$(echo ${{ github.ref }} | sed -e "s#refs/tags/##g")
-          # GitHub Releaseを作成し、PDFを添付
-          gh release create ${VERSION} -t "${VERSION}" out/pdf/${{ env.ARTIFACT_NAME }}
+      # PDFをGitHub Pagesにデプロイ
+      - name: Deploy PDF to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: pdf # アーティファクトでダウンロードしたPDFが格納されるディレクトリ
+          destination_dir: pdf # デプロイ先フォルダ名
