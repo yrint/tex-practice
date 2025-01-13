@@ -42,7 +42,7 @@ jobs:
       # Dockerコンテナ内でLaTeXファイルをコンパイルしてPDFを生成
       - name: Compile LaTeX with latexmk inside Docker
         run: |
-          docker run --rm -v ${{ github.workspace }}:/workdir texlive-container \
+          docker run --rm -v ${{ github.workspace }}:/workdir texlive-container:latest \
           sh -c "cd tex && latexmk -r .latexmkrc -pdf main.tex"
 
       # コンパイルされたPDFを確認
