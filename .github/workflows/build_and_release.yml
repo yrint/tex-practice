@@ -77,12 +77,13 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: pdf
+          path: pdf
 
       # ダウンロードしたPDFファイルをリストする
       - name: List downloaded PDF files
         run: |
           echo "Listing downloaded files in the working directory:"
-          ls -R $GITHUB_WORKSPACE/pdf
+          ls -R pdf
 
       # PDFをGitHub Pagesにデプロイ
       - name: Deploy PDF to GitHub Pages
