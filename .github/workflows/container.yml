@@ -1,0 +1,44 @@
+name: container build
+
+on:
+  push:
+    branches:
+      - test
+    # .github内が変更されたときは実行しない
+    paths-ignore:
+      - .github/**
+
+env:
+  # 生成するPDFファイルの名前
+  ARTIFACT_NAME: main.pdf
+
+# 実行されるジョブの定義
+jobs:
+  # PDFのビルドジョブ
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+      # リポジトリのソースコードをチェックアウト
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Dockerコンテナ内でLaTeXファイルをコンパイルしてPDFを生成
+      - name: Compile LaTeX with latexmk inside Docker
+        run: |
+          docker build -t texlive-container .
+          docker run --rm -v ${{ github.workspace }}:/workdir texlive-container \
+          sh -c "cd tex && latexmk -r .latexmkrc -pdf main.tex"
+
+      # コンパイルされたPDFを確認
+      - name: List generated files
+        run: |
+          echo "Generated files in 'out/pdf' directory:"
+          ls -R out/pdf
+
+      # 生成したPDFをGitHub Actionsにアップロード
+      - name: Upload PDF artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pdf
+          path: out/pdf/${{ env.ARTIFACT_NAME }}
