@@ -30,31 +30,29 @@ RUN tlmgr update --self --all && \
     collection-langenglish \
     collection-langjapanese \
     collection-latexrecommended \
-    collection-latexextra\
-    latexmk\
+    collection-latexextra \
+    latexmk \
     latexindent
 
 # 使用するパッケージをインストール
-RUN tlmgr install\
-    biber\
-    siunitx\
-    physics2\
-    fixdif\
+RUN tlmgr install \
+    biber \
+    siunitx \
+    physics2 \
+    fixdif \
     derivative
-
-# 追加のパッケージをインストールする場合(オプション)
-
     
+# 他に使用するパッケージがある場合ここに記述
+
 # luatexフォーマットのみをインストール
 RUN fmtutil-sys --byfmt lualatex && \
     mktexlsr
 
-# ユーザーの作成
+# 作業ディレクトリと出力ディレクトリの作成と権限変更
+RUN mkdir -p /workdir/out/pdf /workdir/out/.tex_intermediates && \
+    chown -R latex:latex /workdir
+
+# ユーザーの作成と作業ディレクトリの設定
 RUN useradd -m -u 1000 -s /bin/bash latex
-
-# 作業ディレクトリの設定と権限の変更
-WORKDIR /workdir
-RUN chown -R latex:latex /workdir
-
-# 作業ディレクトリに移動
 USER latex
+WORKDIR /workdir
