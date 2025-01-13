@@ -12,7 +12,7 @@ RUN apt-get update && \
     apt-get install -y curl perl fontconfig && \
     rm -rf /var/lib/apt/lists/*
 
-# TeX Live frozen 版のインストール（基本スキームでインストール）
+# TeX Liveのインストール
 RUN mkdir /tmp/install-tl-unx && \
     curl -L https://ftp.jaist.ac.jp/pub/CTAN/systems/texlive/tlnet/install-tl-unx.tar.gz -o /tmp/install-tl-unx.tar.gz && \
     tar -xzvf /tmp/install-tl-unx.tar.gz -C /tmp/install-tl-unx --strip-components=1 && \
@@ -23,7 +23,7 @@ RUN mkdir /tmp/install-tl-unx && \
     rm -r /tmp/install-tl-unx && \
     ln -sf /usr/local/texlive/${TEXLIVE_VERSION}/bin/$(uname -m)-linux /usr/local/texlive/bin
 
-# 必要なパッケージをインストール
+# 基本的なパッケージをインストール
 RUN tlmgr update --self --all && \
     tlmgr install \
     collection-luatex \
@@ -31,16 +31,19 @@ RUN tlmgr update --self --all && \
     collection-langjapanese \
     collection-latexrecommended \
     collection-latexextra\
-    physics2\
-    fixdif\
-    latexmk \
+    latexmk\
     latexindent
 
-# 追加のパッケージをインストール
-RUN tlmgr install \
+# 使用するパッケージをインストール
+RUN tlmgr install\
     biber\
     siunitx\
+    physics2\
+    fixdif\
     derivative
+
+# 追加のパッケージをインストールする場合(オプション)
+
     
 # luatexフォーマットのみをインストール
 RUN fmtutil-sys --byfmt lualatex && \
