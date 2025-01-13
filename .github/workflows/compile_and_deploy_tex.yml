@@ -5,6 +5,9 @@ on:
     branches:
       - main
 
+    paths-ignore:
+      - .github/**
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -36,18 +39,19 @@ jobs:
       # latexmkでPDFをコンパイル
       - name: Compile LaTeX with latexmk
         run: |
+          cd tex
           latexmk -r .latexmkrc -pdf main.tex
 
       # コンパイル結果の確認
       - name: List generated files
         run: |
-          echo "Generated files in 'out' directory:"
-          ls -R out
+          echo "Generated files in 'out/pdf' directory:"
+          ls -R out/pdf
 
       # PDFをGitHub Pagesにデプロイ
       - name: Deploy PDF to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: out # 生成されたPDFが格納されたディレクトリ
+          publish_dir: tex/out/pdf # 生成されたPDFが格納されたディレクトリ
           destination_dir: pdf # デプロイ先フォルダ名

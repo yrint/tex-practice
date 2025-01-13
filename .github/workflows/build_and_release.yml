@@ -1,0 +1,80 @@
+# PDFのビルドとリリースを行うワークフロー
+name: Build and Release PDF
+
+# masterブランチへのpush、またはvから始まるタグに対して実行
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - "v*"
+    # .github内が変更されたときは実行しない
+    paths-ignore:
+      - .github/**
+
+env:
+  # 生成するPDFファイルの名前
+  ARTIFACT_NAME: main.pdf
+
+# 実行されるジョブの定義
+jobs:
+  # PDFのビルドジョブ
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+      # リポジトリのソースコードをチェックアウト
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # LaTeX環境のセットアップ
+      - name: Setup LaTeX environment
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y texlive-full latexmk biber
+
+      # LaTeXファイルをコンパイルしてPDFを生成
+      - name: Compile LaTeX with latexmk
+        run: |
+          latexmk -r tex/.latexmkrc -pdf tex/main.tex
+
+      # コンパイルされたPDFを確認
+      - name: List generated files
+        run: |
+          echo "Generated files in 'out/pdf' directory:"
+          ls -R out/pdf
+
+      # 生成したPDFをGitHub Actionsにアップロード
+      - name: Upload PDF artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pdf
+          path: out/pdf/${{ env.ARTIFACT_NAME }}
+
+  # GitHubのRelease作成ジョブ
+  release:
+    # タグがpushされた場合のみ実行
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: build
+    runs-on: ubuntu-22.04
+
+    steps:
+      # リポジトリのソースコードをチェックアウト
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # アーティファクトからPDFをダウンロード
+      - name: Download PDF artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: pdf
+
+      # GitHub Releaseを作成
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # タグ名からバージョンを抽出
+          VERSION=$(echo ${{ github.ref }} | sed -e "s#refs/tags/##g")
+          # GitHub Releaseを作成し、PDFを添付
+          gh release create ${VERSION} -t "${VERSION}" out/pdf/${{ env.ARTIFACT_NAME }}
