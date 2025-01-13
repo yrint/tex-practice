@@ -25,17 +25,24 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # LaTeX環境のセットアップ
-      - name: Setup LaTeX environment
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y texlive-full latexmk biber
+      # Dockerのセットアップ
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      # LaTeXファイルをコンパイルしてPDFを生成
-      - name: Compile LaTeX with latexmk
+      # Dockerコンテナのビルド
+      - name: Build Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha
+
+      # Dockerコンテナ内でLaTeXファイルをコンパイルしてPDFを生成
+      - name: Compile LaTeX with latexmk inside Docker
         run: |
-          cd tex
-          latexmk -r .latexmkrc -pdf main.tex
+          docker run --rm -v ${{ github.workspace }}:/workdir texlive-container \
+          sh -c "cd tex && latexmk -r .latexmkrc -pdf main.tex"
 
       # コンパイルされたPDFを確認
       - name: List generated files
