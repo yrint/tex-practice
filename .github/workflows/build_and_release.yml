@@ -37,6 +37,7 @@ jobs:
           push: false
           cache-from: type=gha
           cache-to: type=gha
+          tags: texlive-container:latest
 
       # Dockerコンテナ内でLaTeXファイルをコンパイルしてPDFを生成
       - name: Compile LaTeX with latexmk inside Docker
