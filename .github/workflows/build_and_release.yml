@@ -1,11 +1,11 @@
 # PDFのビルドとリリースを行うワークフロー
 name: Build and Deploy PDF
 
-# masterブランチへのpushに対して実行
+# mainブランチへのpushに対して実行
 on:
   push:
     branches:
-      - master
+      - main
     # .github内が変更されたときは実行しない
     paths-ignore:
       - .github/**
