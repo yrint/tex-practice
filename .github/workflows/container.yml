@@ -3,10 +3,7 @@ name: container build
 on:
   push:
     branches:
-      - test
-    # .github内が変更されたときは実行しない
-    paths-ignore:
-      - .github/**
+      - main
 
 env:
   # 生成するPDFファイルの名前
