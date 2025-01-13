@@ -31,9 +31,17 @@ RUN tlmgr update --self --all && \
     collection-langjapanese \
     collection-latexrecommended \
     collection-latexextra\
+    physics2\
+    fixdif\
     latexmk \
     latexindent
 
+# 追加のパッケージをインストール
+RUN tlmgr install \
+    biber\
+    siunitx\
+    derivative
+    
 # luatexフォーマットのみをインストール
 RUN fmtutil-sys --byfmt lualatex && \
     mktexlsr
