@@ -21,11 +21,11 @@ jobs:
 
       # Docker Buildx をセットアップ
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
 
       # Docker イメージをビルドしてキャッシュを活用
       - name: Build and push Docker image
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v6
         with:
           context: .
           push: false
