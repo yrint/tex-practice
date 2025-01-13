@@ -19,6 +19,8 @@ jobs:
   # PDFのビルドジョブ
   build:
     runs-on: ubuntu-22.04
+    container:
+      image: texlive/texlive:latest
 
     steps:
       # リポジトリのソースコードをチェックアウト
@@ -34,20 +36,19 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: ./Dockerfile
           push: false
           cache-from: type=gha
           cache-to: type=gha
-          tags: texlive-container:latest
+          tags: texlive/texlive:latest
 
       # 作成されたdockerイメージを確認
-      - name: List Docker image
+      - name: List Docker images
         run: docker images
 
       # Dockerコンテナ内でLaTeXファイルをコンパイルしてPDFを生成
       - name: Compile LaTeX with latexmk inside Docker
         run: |
-          docker run --rm -v ${{ github.workspace }}:/workdir texlive-container:latest \
+          docker run --rm -v ${{ github.workspace }}:/workdir texlive/texlive:latest \
           sh -c "cd tex && latexmk -r .latexmkrc -pdf main.tex"
 
       # コンパイルされたPDFを確認
