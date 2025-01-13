@@ -19,8 +19,6 @@ jobs:
   # PDFのビルドジョブ
   build:
     runs-on: ubuntu-22.04
-    container:
-      image: texlive/texlive:latest
 
     steps:
       # リポジトリのソースコードをチェックアウト
