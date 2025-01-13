@@ -1,10 +1,28 @@
-\documentclass{jlreq}
+\documentclass[paper=a4paper]{jlreq}
 \usepackage{style/mypackage}
 \addbibresource{bibliography/ref1.bib}
 
 \begin{document}
 aiueo\cite{Hemingway1952}\\
 aiueo\\
+\[
+    \pab{\frac{1}{2}}    \quad %  ( )
+    \bab{\frac{1}{2}}    \quad %  [ ]
+    \Bab{\frac{1}{2}}    \quad %  { }
+    \vab{\frac{1}{2}}    \quad %  | |
+    \Vab{\frac{1}{2}}    \quad % \| \|
+    \aab{\frac{1}{2}}          %  < >
+\]
+% ab.braket module
+\[
+    \braket< \psi >                           \quad
+    \braket< \frac{\phi}{2} | \psi >          \quad
+    \braket< \frac{\phi}{2} | H | \psi >      \quad
+\]
+\[
+    \pxmat{M}{m}{n}
+\]
+
 \input{contents/first.tex}\\
 \input{contents/second.tex}\\
 \printbibliography
