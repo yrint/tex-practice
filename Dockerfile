@@ -55,8 +55,9 @@ RUN useradd -m -u 1000 -s /bin/bash latex
 RUN mkdir -p /workdir/out/pdf /workdir/out/.tex_intermediates
 
 # 作業ディレクトリに移動し、権限を変更
-USER latex
+USER root
 RUN chown -R latex:latex /workdir
 
 # 作業ディレクトリの設定
+USER latex
 WORKDIR /workdir
