@@ -1,5 +1,5 @@
 # Artifacts
-生成されたPDFは[https://use_rname.github.io/repository_name/pdf/main.pdf](https://yrint.github.io/tex-practice/pdf/main.pdf)にアップロードされます。
+mainブランチにプッシュするとmain.texからPDFが生成され、生成されたPDFは[https://use_rname.github.io/repository_name/pdf/main.pdf](https://yrint.github.io/tex-practice/pdf/main.pdf)にアップロードされます。
 # このTeXプロジェクトのディレクトリ構成
 ```
 tex-project/
