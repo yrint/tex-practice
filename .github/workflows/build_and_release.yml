@@ -34,10 +34,15 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
+          file: ./Dockerfile
           push: false
           cache-from: type=gha
           cache-to: type=gha
           tags: texlive-container:latest
+
+      # 作成されたdockerイメージを確認
+      - name: List Docker image
+        run: docker images
 
       # Dockerコンテナ内でLaTeXファイルをコンパイルしてPDFを生成
       - name: Compile LaTeX with latexmk inside Docker
