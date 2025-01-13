@@ -25,13 +25,8 @@ jobs:
 
       # Docker イメージをローカルでビルド
       - name: Build Docker image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          push: false
-          tags: texlive-container:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+        run: |
+          docker build -t texlive-container:latest .
 
       # Docker イメージがビルドされたか確認
       - name: Verify Docker image
