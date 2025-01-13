@@ -48,11 +48,15 @@ RUN tlmgr install \
 RUN fmtutil-sys --byfmt lualatex && \
     mktexlsr
 
-# 作業ディレクトリと出力ディレクトリの作成と権限変更
-RUN mkdir -p /workdir/out/pdf /workdir/out/.tex_intermediates && \
-    chown -R latex:latex /workdir
-
-# ユーザーの作成と作業ディレクトリの設定
+# ユーザーの作成
 RUN useradd -m -u 1000 -s /bin/bash latex
+
+# 作業ディレクトリと出力ディレクトリの作成
+RUN mkdir -p /workdir/out/pdf /workdir/out/.tex_intermediates
+
+# 作業ディレクトリに移動し、権限を変更
 USER latex
+RUN chown -R latex:latex /workdir
+
+# 作業ディレクトリの設定
 WORKDIR /workdir
