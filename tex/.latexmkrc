@@ -1,28 +1,36 @@
-# 使用するエンジンを指定
-$pdflatex = 'lualatex -shell-escape -file-line-error -interaction=nonstopmode';
+#!/usr/bin/env perl
 
-# エラー停止しないモードを有効化
-$pdf_mode = 1;
+# 共通オプション
+my $common_opts = '-synctex=1 -interaction=nonstopmode %S';
 
-# 必要に応じてbibtexやbiberを設定
-$bibtex = 'bibtex %O %B';
-$biber = 'biber %O %B';
+# LaTeXエンジン設定
+$latex    = "lualatex %O $common_opts";
+$pdflatex = "pdflatex %O $common_opts";
+$lualatex = "lualatex %O $common_opts";
+$xelatex  = "xelatex %O $common_opts";
 
-# エラー解消のための自動ループの最大回数
-$max_repeat = 5;
+# ビブリオグラフィー設定
+$biber  = 'biber %O --bblencoding=utf8 -u -U --output_safechars %B';
+$bibtex = 'bibtexu %O %B';
 
-# 出力ディレクトリの指定
-$out_dir = "../out/pdf";
+# インデックス・変換ツール
+$makeindex = 'upmendex %O -o %D %S';
+$dvipdf    = 'dvipdfmx %O -o %D %S';
+$dvips     = 'dvips %O -z -f %S | convbkmk -u > %D';
+$ps2pdf    = ($^O eq 'MSWin32') ? 'ps2pdf.exe %O %S %D' : 'ps2pdf %O %S %D';
 
-# 中間ファイルを別フォルダに保存
-$aux_dir = "../out/.tex_intermediates";
-
-# 入力ファイルのディレクトリを明示的に指定
-# プロジェクトルートの`tex/`ディレクトリ配下のリソースを検索対象に含める
-$search_path_separator = ":"; # Linux/Unix用
-$ENV{'TEXINPUTS'} = "tex/contents:tex/figures:tex/bibliography:tex/style:";
-
-# デフォルトのターゲットファイルを指定
+# ビルド設定
+$pdf_mode     = 3;
+$max_repeat   = 5;
+$out_dir      = '../out/pdf';
+$aux_dir      = '../out/.tex_intermediates';
+$directory    = 'tex';
 @default_files = ("tex/main.tex");
+$clean_full_ext = '../out/*';
 
-# MakeIndexやMakeGlossariesの設定（必要なら追加）
+# 自動処理
+add_cus_dep('bib', 'bbl', 0, 'run_biber');
+sub run_biber {
+    system("biber $_[0]");
+}
+`

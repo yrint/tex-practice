@@ -4,18 +4,19 @@
 %---一般---
 \usepackage[top=30mm, bottom=30mm, left=20mm, right=20mm]{geometry}
 \usepackage{enumitem}
-\usepackage{fancybox, ascmac}
+\usepackage{fancybox, ascmac, dashbox}
 \usepackage{docmute} %ファイルの分割
 \usepackage{biblatex} %参考文献
 
 %---画像関連---
 \usepackage{graphicx} %画像の挿入
 \usepackage{tikz, tikz-3dplot} %グラフや図形の描画
-\usetikzlibrary{angles,calc,quotes,math}
+\usetikzlibrary{angles,calc,quotes,math,intersections}
 \usepackage{wrapfig} %図の回り込み
 
 %---数式関連---
-\usepackage{amsmath, mathtools, empheq} %基本的な数式環境
+\usepackage{amsmath, amsthm, mathtools, empheq} %基本的な数式環境
+\renewcommand{\qedsymbol}{} %証明末尾の四角を消す
 \usepackage{amssymb, mathrsfs} %数学記号やフォント、花文字
 \usepackage{physics2}
 \usephysicsmodule{ab} % 括弧サイズの自動調整
@@ -25,3 +26,4 @@
 \usepackage{bm} %ベクトルなどで使用する太字斜体用コマンド\bm
 \usepackage{fixdif, derivative} %微分記法
 \usepackage{siunitx} %単位の表記
+\newcommand{\parallelj}{/\!/} %平行記号
