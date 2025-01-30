@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - main
-    paths-ignore:
-      - .github/**
 
 env:
   # 生成するPDFファイルの名前
@@ -52,7 +50,7 @@ jobs:
       - name: Compile LaTeX with Docker container
         run: |
           docker run --rm -v ${{ github.workspace }}:/workdir texlive-container:latest \
-          sh -c "cd tex && latexmk main.tex"
+          sh -c "cd tex && latexmk -r .latexmkrc -pdf main.tex"
 
       # コンパイルされたPDFを確認
       - name: List generated files
