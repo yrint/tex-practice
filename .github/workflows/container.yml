@@ -1,4 +1,4 @@
-name: Container Build and PDF Deployment
+name: Build and Deploy PDF
 
 on:
   push:
@@ -6,8 +6,10 @@ on:
       - main
 
 env:
-  # 生成するPDFファイルの名前
-  ARTIFACT_NAME: main.pdf
+  ARTIFACT_NAME: pdf-artifacts
+  PDF_DIR: out/pdf
+  TEX_INTERMEDIATES_DIR: out/.tex_intermediates
+  PDF_ARTIFACT_PATH: out/pdf/
 
 jobs:
   build:
@@ -53,16 +55,6 @@ jobs:
           name: texlive-container-image
           path: texlive-container-image.tar
 
-      # Docker イメージがビルドされたか確認
-      - name: Verify Docker image
-        run: |
-          echo "Listing Docker images to verify the build:"
-          docker images
-          if ! docker images | grep -q "texlive-container"; then
-            echo "Docker image 'texlive-container:latest' was not built successfully."
-            exit 1
-          fi
-
   deploy:
     needs: build
     runs-on: ubuntu-22.04
@@ -83,6 +75,12 @@ jobs:
         run: |
           docker load -i ./texlive-container-image.tar
 
+      # 出力ディレクトリを作成
+      - name: Create Output Directories
+        run: |
+          mkdir -p ${{ env.PDF_DIR }} ${{ env.TEX_INTERMEDIATES_DIR }}
+          chmod -R 755 out
+
       # コンテナを起動してPDFを生成
       - name: Run Container to Generate PDF
         run: |
@@ -92,14 +90,14 @@ jobs:
             bash -c "cd tex && latexmk main.tex"
 
       # 生成されたPDFを確認
-      - name: List generated PDF files
+      - name: List Generated PDF files
         run: |
           echo "Generated PDF files:"
-          ls -R out/pdf
+          ls -R ${{ env.PDF_DIR }}
 
       # 生成したPDFをアーティファクトとしてアップロード
       - name: Upload PDF artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.ARTIFACT_NAME }}
-          path: out/pdf/${{ env.ARTIFACT_NAME }}
+          path: ${{ env.PDF_ARTIFACT_PATH }}
