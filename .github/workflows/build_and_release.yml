@@ -29,7 +29,7 @@ jobs:
       - name: Compile LaTeX with latexmk inside Docker
         run: |
           docker run --rm -v ${{ github.workspace }}:/workdir texlive/texlive:latest \
-          sh -c "cd tex && latexmk -r .latexmkrc -pdf main.tex"
+          sh -c "cd tex && latexmk main.tex"
 
       # コンパイルされたPDFを確認
       - name: List generated files
