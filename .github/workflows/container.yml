@@ -46,7 +46,7 @@ jobs:
         run: |
           echo "Listing Docker images to verify the build:"
           docker images
-          if ! docker images | grep -q "texlive-container:latest"; then
+          if ! docker images | grep -q "texlive-container"; then
             echo "Docker image 'texlive-container:latest' was not built successfully."
             exit 1
           fi
