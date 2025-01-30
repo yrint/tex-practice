@@ -41,6 +41,18 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha, mode=max
 
+      # Docker イメージを保存
+      - name: Save Docker image
+        run: |
+          docker save texlive-container:latest -o texlive-container-image.tar
+
+      # Docker イメージをアーティファクトとしてアップロード
+      - name: Upload Docker image as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: texlive-container-image
+          path: texlive-container-image.tar
+
       # Docker イメージがビルドされたか確認
       - name: Verify Docker image
         run: |
@@ -58,6 +70,13 @@ jobs:
       # リポジトリのソースコードを再度チェックアウト
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      # アーティファクトからDockerイメージをダウンロード
+      - name: Download Docker image artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: texlive-container-image
+          path: .
 
       # Docker イメージをロード
       - name: Load Docker image
