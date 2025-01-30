@@ -6,10 +6,10 @@ on:
       - main
 
 env:
-  ARTIFACT_NAME: main.pdf
+  ARTIFACT_NAME: pdf-artifacts
   PDF_DIR: out/pdf
   TEX_INTERMEDIATES_DIR: out/.tex_intermediates
-  PDF_ARTIFACT_PATH: out/pdf/main.pdf
+  PDF_ARTIFACT_PATH: out/pdf/
 
 jobs:
   build:
@@ -78,7 +78,7 @@ jobs:
       # 出力ディレクトリを作成
       - name: Create Output Directories
         run: |
-          mkdir -p out/pdf out/.tex_intermediates
+          mkdir -p ${{ env.PDF_DIR }} ${{ env.TEX_INTERMEDIATES_DIR }}
           chmod -R 755 out
 
       # コンテナを起動してPDFを生成
@@ -93,7 +93,7 @@ jobs:
       - name: List Generated PDF files
         run: |
           echo "Generated PDF files:"
-          ls -R out/pdf
+          ls -R ${{ env.PDF_DIR }}
 
       # 生成したPDFをアーティファクトとしてアップロード
       - name: Upload PDF artifact
