@@ -1,16 +1,16 @@
 FROM ubuntu:22.04
 
-ARG TEXLIVE_VERSION=2024
-
+# 必要な環境変数の設定
 ENV DEBIAN_FRONTEND=noninteractive
-ENV DEBCONF_NOWARNINGS=yes
-ENV PATH="/usr/local/texlive/bin:$PATH"
-ENV LC_ALL=C
+ENV TEXLIVE_VERSION=2023
+ENV PATH="/usr/local/texlive/${TEXLIVE_VERSION}/bin/x86_64-linux:$PATH"
 
 # 必要な依存関係をインストール
-RUN apt-get update && \
-    apt-get install -y curl perl fontconfig && \
-    rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y \
+    curl \
+    perl \
+    fontconfig \
+    && rm -rf /var/lib/apt/lists/*
 
 # TeX Liveのインストール
 RUN mkdir /tmp/install-tl-unx && \
@@ -26,38 +26,30 @@ RUN mkdir /tmp/install-tl-unx && \
 # 基本的なパッケージをインストール
 RUN tlmgr update --self --all && \
     tlmgr install \
-    collection-luatex \
-    collection-langenglish \
-    collection-langjapanese \
-    collection-latexrecommended \
-    collection-latexextra \
-    latexmk \
-    latexindent
+        collection-luatex \
+        collection-langenglish \
+        collection-langjapanese \
+        collection-latexrecommended \
+        collection-latexextra \
+        latexmk \
+        latexindent
 
 # 使用するパッケージをインストール
 RUN tlmgr install \
-    biber \
-    siunitx \
-    physics2 \
-    fixdif \
-    derivative
-    
+        biber \
+        siunitx \
+        physics2 \
+        fixdif \
+        derivative
+
 # 他に使用するパッケージがある場合ここに記述
 
-# luatexフォーマットのみをインストール
-RUN fmtutil-sys --byfmt lualatex && \
-    mktexlsr
+# 以下をまとめて一度に実行してレイヤーを削減
+RUN useradd -m -u 1000 -s /bin/bash latex && \
+    mkdir -p /workdir/out/pdf /workdir/out/.tex_intermediates && \
+    chown -R latex:latex /workdir && \
+    mkdir -p /out/pdf /out/.tex_intermediates && \
+    chown -R latex:latex /out
 
-# ユーザーの作成
-RUN useradd -m -u 1000 -s /bin/bash latex
-
-# 作業ディレクトリと出力ディレクトリの作成
-RUN mkdir -p /workdir/out/pdf /workdir/out/.tex_intermediates
-
-# 作業ディレクトリに移動し、権限を変更
-USER root
-RUN chown -R latex:latex /workdir
-
-# 作業ディレクトリの設定
 USER latex
 WORKDIR /workdir
