@@ -44,6 +44,7 @@ RUN tlmgr install \
 
 # 他に使用するパッケージがある場合ここに記述
 
+
 # luatexフォーマットのみをインストール
 RUN fmtutil-sys --byfmt lualatex && \
     mktexlsr
