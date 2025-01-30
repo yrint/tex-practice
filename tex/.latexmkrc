@@ -10,7 +10,7 @@ $lualatex = "lualatex %O $common_opts";
 $xelatex  = "xelatex %O $common_opts";
 
 # ビブリオグラフィー設定
-$biber  = 'biber %O --bblencoding=utf8 -u -U --output_safechars %B';
+$biber  = 'biber %O %B';
 $bibtex = 'bibtexu %O %B';
 
 # インデックス・変換ツール
