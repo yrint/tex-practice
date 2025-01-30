@@ -1,16 +1,16 @@
 FROM ubuntu:22.04
 
-# 必要な環境変数の設定
+ARG TEXLIVE_VERSION=2024
+
 ENV DEBIAN_FRONTEND=noninteractive
-ENV TEXLIVE_VERSION=2023
-ENV PATH="/usr/local/texlive/${TEXLIVE_VERSION}/bin/x86_64-linux:$PATH"
+ENV DEBCONF_NOWARNINGS=yes
+ENV PATH="/usr/local/texlive/bin:$PATH"
+ENV LC_ALL=C
 
 # 必要な依存関係をインストール
-RUN apt-get update && apt-get install -y \
-    curl \
-    perl \
-    fontconfig \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && \
+    apt-get install -y curl perl fontconfig && \
+    rm -rf /var/lib/apt/lists/*
 
 # TeX Liveのインストール
 RUN mkdir /tmp/install-tl-unx && \
@@ -44,7 +44,11 @@ RUN tlmgr install \
 
 # 他に使用するパッケージがある場合ここに記述
 
-# 以下をまとめて一度に実行してレイヤーを削減
+# luatexフォーマットのみをインストール
+RUN fmtutil-sys --byfmt lualatex && \
+    mktexlsr
+
+# ユーザーの追加 & ディレクトリの作成
 RUN useradd -m -u 1000 -s /bin/bash latex && \
     mkdir -p /workdir/out/pdf /workdir/out/.tex_intermediates && \
     chown -R latex:latex /workdir && \

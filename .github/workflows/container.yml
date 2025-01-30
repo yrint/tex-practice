@@ -1,4 +1,4 @@
-name: container build
+name: Container Build and PDF Deployment
 
 on:
   push:
@@ -10,10 +10,8 @@ env:
   ARTIFACT_NAME: main.pdf
 
 jobs:
-  # Docker イメージのビルドとPDF生成ジョブ
   build:
     runs-on: ubuntu-22.04
-
     steps:
       # リポジトリのソースコードをチェックアウト
       - name: Checkout repository
@@ -23,7 +21,16 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # Docker イメージをキャッシュを活用して高速化してビルド
+      # キャッシュの設定
+      - name: Cache Docker layers
+        uses: actions/cache@v3
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      # Docker イメージをビルド
       - name: Build Docker image
         uses: docker/build-push-action@v6
         with:
@@ -31,36 +38,63 @@ jobs:
           push: false
           load: true
           tags: texlive-container:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
+
+      # キャッシュを移動
+      - name: Move Buildx Cache
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
       # Docker イメージがビルドされたか確認
       - name: Verify Docker image
         run: |
           echo "Listing Docker images to verify the build:"
           docker images
-          if ! docker images | grep -q "texlive-container"; then
+          if ! docker images | grep -q "texlive-container:latest"; then
             echo "Docker image 'texlive-container:latest' was not built successfully."
             exit 1
-          else
-            echo "Docker image 'texlive-container:latest' was built successfully."
           fi
 
-      # コンテナを使ってLaTeXファイルをコンパイル
-      - name: Compile LaTeX with Docker container
-        run: |
-          docker run --rm -v ${{ github.workspace }}:/workdir texlive-container:latest \
-          sh -c "cd tex && latexmk -r .latexmkrc -pdf main.tex"
+      # 生成したDockerイメージをアーティファクトとして保存
+      - name: Save Docker image as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: texlive-container-image
+          path: |
+            /var/lib/docker/image/overlay2/*/cache
 
-      # コンパイルされたPDFを確認
-      - name: List generated files
+  deploy:
+    needs: build
+    runs-on: ubuntu-22.04
+    steps:
+      # リポジトリのソースコードを再度チェックアウト
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Docker イメージをロード
+      - name: Load Docker image
         run: |
-          echo "Generated files in 'out/pdf' directory:"
+          docker load -i ./texlive-container-image.tar
+
+      # コンテナを起動してPDFを生成
+      - name: Run Container to Generate PDF
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/workdir \
+            texlive-container:latest \
+            latexmk -pdf -interaction=nonstopmode -output-directory=out/pdf tex/main.tex
+
+      # 生成されたPDFを確認
+      - name: List generated PDF files
+        run: |
+          echo "Generated PDF files:"
           ls -R out/pdf
 
-      # 生成したPDFをGitHub Actionsにアップロード
+      # 生成したPDFをアーティファクトとしてアップロード
       - name: Upload PDF artifact
         uses: actions/upload-artifact@v4
         with:
-          name: pdf
+          name: ${{ env.ARTIFACT_NAME }}
           path: out/pdf/${{ env.ARTIFACT_NAME }}
