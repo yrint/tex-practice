@@ -89,7 +89,7 @@ jobs:
           docker run --rm \
             -v ${{ github.workspace }}:/workdir \
             texlive-container:latest \
-            latexmk -pdf -interaction=nonstopmode -output-directory=out/pdf tex/main.tex
+            bash -c "cd tex && latexmk main.tex"
 
       # 生成されたPDFを確認
       - name: List generated PDF files
