@@ -7,9 +7,9 @@ on:
 
 env:
   ARTIFACT_NAME: pdf-artifacts
-  PDF_DIR: out/pdf
-  TEX_INTERMEDIATES_DIR: out/.tex_intermediates
-  PDF_ARTIFACT_PATH: out/pdf/
+  PDF_DIR: tex/out/pdf
+  TEX_INTERMEDIATES_DIR: tex/out/.tex_intermediates
+  PDF_ARTIFACT_PATH: tex/out/pdf/
 
 jobs:
   build:

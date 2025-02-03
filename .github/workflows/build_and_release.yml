@@ -34,15 +34,15 @@ jobs:
       # コンパイルされたPDFを確認
       - name: List generated files
         run: |
-          echo "Generated files in 'out/pdf' directory:"
-          ls -R out/pdf
+          echo "Generated files in 'tex/out/pdf' directory:"
+          ls -R tex/out/pdf
 
       # 生成したPDFをGitHub Actionsにアップロード
       - name: Upload PDF artifact
         uses: actions/upload-artifact@v4
         with:
           name: pdf
-          path: out/pdf/${{ env.ARTIFACT_NAME }}
+          path: tex/out/pdf/${{ env.ARTIFACT_NAME }}
 
   # PDFのDeploy
   Deploy-PDF:
