@@ -50,11 +50,7 @@ RUN fmtutil-sys --byfmt lualatex && \
     mktexlsr
 
 # ユーザーの追加 & ディレクトリの作成
-RUN useradd -m -u 1000 -s /bin/bash latex && \
-    mkdir -p /workdir/out/pdf /workdir/out/.tex_intermediates && \
-    chown -R latex:latex /workdir && \
-    mkdir -p /out/pdf /out/.tex_intermediates && \
-    chown -R latex:latex /out
+RUN useradd -m -u 1000 -s /bin/bash latex 
 
 USER latex
 WORKDIR /workdir
