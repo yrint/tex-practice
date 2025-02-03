@@ -22,11 +22,11 @@ $ps2pdf    = ($^O eq 'MSWin32') ? 'ps2pdf.exe %O %S %D' : 'ps2pdf %O %S %D';
 # ビルド設定
 $pdf_mode     = 3;
 $max_repeat   = 5;
-$out_dir      = '../out/pdf';
-$aux_dir      = '../out/.tex_intermediates';
+$out_dir      = 'out/pdf';
+$aux_dir      = 'out/.tex_intermediates';
 $directory    = 'tex';
 @default_files = ("tex/main.tex");
-$clean_full_ext = '../out/*';
+$clean_full_ext = 'out/*';
 
 # 自動処理
 add_cus_dep('bib', 'bbl', 0, 'run_biber');
